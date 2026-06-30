@@ -37,7 +37,9 @@ export function AppSidebar() {
         <div className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-wider text-sidebar-foreground/50">
           Workspace
         </div>
-        {nav.map(({ to, label, icon: Icon, end, badge }) => (
+        {nav.map(({ to, label, icon: Icon, end, badgeKey }) => {
+          const badge = badgeKey ? stats[badgeKey] : undefined;
+          return (
           <NavLink
             key={to}
             to={to}
@@ -59,7 +61,8 @@ export function AppSidebar() {
               </span>
             ) : null}
           </NavLink>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
