@@ -28,9 +28,14 @@ export default function PropertyDetail() {
   const [unitOpen, setUnitOpen] = useState(false);
   const [unitMode, setUnitMode] = useState<"create" | "edit">("create");
   const [unitInitial, setUnitInitial] = useState<UnitFormInitial | undefined>(undefined);
+  const [tenancyOpen, setTenancyOpen] = useState(false);
+  const [tenancyMode, setTenancyMode] = useState<"create" | "edit">("create");
+  const [tenancyInitial, setTenancyInitial] = useState<TenancyRow | undefined>(undefined);
 
   const canManage = !!user && source === "supabase";
   const unitsQuery = usePropertyUnits(property?.id, canManage);
+  const tenanciesQuery = usePropertyTenancies(property?.id, canManage);
+
 
   const openEdit = async () => {
     if (!user || !property) return;
