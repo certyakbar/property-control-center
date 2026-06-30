@@ -78,7 +78,17 @@ export default function PropertyDetail() {
             <Metric label="Readiness" value={`${property.readiness}%`} />
             <Metric label="Open review" value={`${property.openReviewItems}`} />
             <Metric label="Monthly rent" value={gbp(property.expectedMonthlyRent)} />
+            <button
+              type="button"
+              onClick={openEdit}
+              disabled={!user}
+              title={user ? "Edit property" : "Sign in to manage properties."}
+              className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-1.5 hover:bg-secondary disabled:opacity-50"
+            >
+              <Pencil className="size-3.5" /> Edit
+            </button>
           </div>
+
         </div>
 
         <div className="mt-5 h-1.5 rounded-full bg-border overflow-hidden">
