@@ -22,6 +22,9 @@ export default function Layout() {
   const key = Object.keys(titles).find(k => k !== "/" && pathname.startsWith(k)) ?? "/";
   const meta = titles[key] ?? { title: "Property", sub: "" };
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const { source } = useLedgerData();
+  const initials = (user?.email ?? "SH").slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen w-full flex bg-background">
