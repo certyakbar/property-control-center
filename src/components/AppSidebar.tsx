@@ -4,7 +4,7 @@ import {
   CheckSquare, FolderArchive, Settings as SettingsIcon, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { stats } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 
 const nav = [
   { to: "/", label: "Dashboard",      icon: LayoutDashboard,  end: true },
