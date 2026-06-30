@@ -84,7 +84,7 @@ export default function ReviewPage() {
 
 function FilterRow<T extends string>({
   label, options, value, onChange,
-}: { label: string; options: readonly T[]; value: T; onChange: (v: T) => void }) {
+}: { label: string; options: readonly T[]; value: T; onChange: (v: any) => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs uppercase tracking-wider text-muted-foreground w-16">{label}</span>
