@@ -23,6 +23,12 @@ export default function PropertyDetail() {
   const [tab, setTab] = useState<Tab>("Overview");
   const [editOpen, setEditOpen] = useState(false);
   const [editInitial, setEditInitial] = useState<PropertyFormInitial | null>(null);
+  const [unitOpen, setUnitOpen] = useState(false);
+  const [unitMode, setUnitMode] = useState<"create" | "edit">("create");
+  const [unitInitial, setUnitInitial] = useState<UnitFormInitial | undefined>(undefined);
+
+  const canManage = !!user && source === "supabase";
+  const unitsQuery = usePropertyUnits(property?.id, canManage);
 
   const openEdit = async () => {
     if (!user || !property) return;
@@ -34,6 +40,18 @@ export default function PropertyDetail() {
     setEditInitial(data as PropertyFormInitial);
     setEditOpen(true);
   };
+
+  const openAddUnit = () => {
+    setUnitMode("create");
+    setUnitInitial(undefined);
+    setUnitOpen(true);
+  };
+  const openEditUnit = (u: UnitFormInitial) => {
+    setUnitMode("edit");
+    setUnitInitial(u);
+    setUnitOpen(true);
+  };
+
 
 
   if (!property) {
