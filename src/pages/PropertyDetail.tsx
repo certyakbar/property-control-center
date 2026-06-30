@@ -254,6 +254,15 @@ export default function PropertyDetail() {
         propertyId={property.id}
         initial={unitInitial}
       />
+
+      <TenancyFormDialog
+        open={tenancyOpen}
+        onOpenChange={setTenancyOpen}
+        mode={tenancyMode}
+        propertyId={property.id}
+        units={unitsQuery.data ?? []}
+        initial={tenancyInitial}
+      />
     </div>
   );
 }
