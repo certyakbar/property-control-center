@@ -31,7 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Defer RPC to avoid running inside the auth callback synchronously
         setTimeout(() => {
           supabase.rpc("dev_join_demo_org").then(({ error }) => {
-            if (error) console.warn("[auth] dev_join_demo_org failed:", error.message);
+            if (error) {
+              console.warn("[auth] dev_join_demo_org failed:", error.message);
+              return;
+            }
+            queryClient.invalidateQueries({ queryKey: ["active-org"] });
+            queryClient.invalidateQueries({ queryKey: ["ledger"] });
           });
         }, 0);
       }
