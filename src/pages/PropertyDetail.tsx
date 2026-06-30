@@ -217,6 +217,18 @@ export default function PropertyDetail() {
               onEdit={openEditUnit}
             />
           </div>
+
+          <div className="lg:col-span-3">
+            <TenanciesSection
+              tenancies={tenanciesQuery.data ?? []}
+              loading={tenanciesQuery.isLoading}
+              canManage={canManage}
+              hasUnits={(unitsQuery.data ?? []).length > 0}
+              source={source}
+              onAdd={openAddTenancy}
+              onEdit={openEditTenancy}
+            />
+          </div>
         </section>
       )}
 
