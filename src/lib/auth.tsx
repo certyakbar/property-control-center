@@ -18,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const joinedRef = useRef<string | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Register listener first
