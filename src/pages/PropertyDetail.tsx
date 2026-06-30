@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { findProperty, rentRows, expenses, documents, reviewItems, recentActivity, gbp } from "@/data/demo";
+import { recentActivity, gbp } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, statusTone, priorityTone } from "@/components/StatusBadge";
 import { ArrowLeft, Building2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,8 @@ type Tab = typeof tabs[number];
 
 export default function PropertyDetail() {
   const { id = "" } = useParams();
-  const property = findProperty(id);
+  const { properties, rentRows, expenses, documents, reviewItems } = useLedgerData();
+  const property = properties.find(p => p.id === id);
   const [tab, setTab] = useState<Tab>("Overview");
 
   if (!property) {
