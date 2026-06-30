@@ -77,10 +77,27 @@ export default function Layout() {
                   9
                 </span>
               </NavLink>
-              <div className="h-9 px-3 rounded-lg border border-border flex items-center gap-2">
-                <div className="size-6 rounded-full bg-primary text-primary-foreground grid place-items-center text-[11px] font-semibold">SH</div>
-                <span className="text-sm hidden sm:inline">Sam Hartley</span>
-              </div>
+              {user ? (
+                <>
+                  <div className="h-9 px-3 rounded-lg border border-border flex items-center gap-2">
+                    <div className="size-6 rounded-full bg-primary text-primary-foreground grid place-items-center text-[11px] font-semibold">{initials}</div>
+                    <span className="text-sm hidden sm:inline max-w-[160px] truncate">{user.email}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => signOut()}
+                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border text-sm hover:bg-secondary"
+                    aria-label="Sign out"
+                  >
+                    <LogOut className="size-4" />
+                    <span className="hidden sm:inline">Sign out</span>
+                  </button>
+                </>
+              ) : (
+                <NavLink to="/sign-in" className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium inline-flex items-center">
+                  Sign in
+                </NavLink>
+              )}
             </div>
           </div>
         </header>
@@ -89,8 +106,14 @@ export default function Layout() {
           <Outlet />
         </main>
 
-        <footer className="px-4 md:px-8 py-6 text-xs text-muted-foreground border-t border-border">
-          Ledgerless HMO · Phase 1 prototype · Demo data only · Not for tax filing
+        <footer className="px-4 md:px-8 py-6 text-xs text-muted-foreground border-t border-border flex flex-wrap items-center gap-2">
+          <span>Ledgerless HMO · Phase 1 prototype · Not for tax filing</span>
+          {source !== "supabase" && (
+            <span className="ml-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border bg-secondary text-foreground">
+              <span className="size-1.5 rounded-full bg-accent" />
+              Demo data
+            </span>
+          )}
         </footer>
       </div>
     </div>
