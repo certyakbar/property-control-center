@@ -1,8 +1,10 @@
 import { Outlet, useLocation, NavLink } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Bell, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { useLedgerData } from "@/hooks/useLedgerData";
 
 const titles: Record<string, { title: string; sub: string }> = {
   "/":              { title: "Today",          sub: "Your property operations at a glance." },
