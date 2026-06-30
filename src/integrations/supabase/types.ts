@@ -884,6 +884,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      dev_join_demo_org: { Args: never; Returns: string }
       has_org_role: {
         Args: { _org: string; _roles: string[] }
         Returns: boolean
