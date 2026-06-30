@@ -15,7 +15,7 @@ type Tab = typeof tabs[number];
 
 export default function PropertyDetail() {
   const { id = "" } = useParams();
-  const { properties, rentRows, expenses, documents, reviewItems } = useLedgerData();
+  const { properties, rentRows, expenses, documents, reviewItems, source } = useLedgerData();
   const { user } = useAuth();
   const property = properties.find(p => p.id === id);
   const [tab, setTab] = useState<Tab>("Overview");
