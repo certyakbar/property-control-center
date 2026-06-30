@@ -9,7 +9,9 @@ import { ArrowLeft, Building2, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PropertyFormDialog, { type PropertyFormInitial } from "@/components/PropertyFormDialog";
 import UnitFormDialog, { type UnitFormInitial } from "@/components/UnitFormDialog";
+import TenancyFormDialog from "@/components/TenancyFormDialog";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyTenancies, type TenancyRow } from "@/hooks/usePropertyTenancies";
 import { toast } from "sonner";
 
 const tabs = ["Overview", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"] as const;
@@ -26,9 +28,14 @@ export default function PropertyDetail() {
   const [unitOpen, setUnitOpen] = useState(false);
   const [unitMode, setUnitMode] = useState<"create" | "edit">("create");
   const [unitInitial, setUnitInitial] = useState<UnitFormInitial | undefined>(undefined);
+  const [tenancyOpen, setTenancyOpen] = useState(false);
+  const [tenancyMode, setTenancyMode] = useState<"create" | "edit">("create");
+  const [tenancyInitial, setTenancyInitial] = useState<TenancyRow | undefined>(undefined);
 
   const canManage = !!user && source === "supabase";
   const unitsQuery = usePropertyUnits(property?.id, canManage);
+  const tenanciesQuery = usePropertyTenancies(property?.id, canManage);
+
 
   const openEdit = async () => {
     if (!user || !property) return;
@@ -50,6 +57,16 @@ export default function PropertyDetail() {
     setUnitMode("edit");
     setUnitInitial(u);
     setUnitOpen(true);
+  };
+  const openAddTenancy = () => {
+    setTenancyMode("create");
+    setTenancyInitial(undefined);
+    setTenancyOpen(true);
+  };
+  const openEditTenancy = (t: TenancyRow) => {
+    setTenancyMode("edit");
+    setTenancyInitial(t);
+    setTenancyOpen(true);
   };
 
 
@@ -200,6 +217,18 @@ export default function PropertyDetail() {
               onEdit={openEditUnit}
             />
           </div>
+
+          <div className="lg:col-span-3">
+            <TenanciesSection
+              tenancies={tenanciesQuery.data ?? []}
+              loading={tenanciesQuery.isLoading}
+              canManage={canManage}
+              hasUnits={(unitsQuery.data ?? []).length > 0}
+              source={source}
+              onAdd={openAddTenancy}
+              onEdit={openEditTenancy}
+            />
+          </div>
         </section>
       )}
 
@@ -224,6 +253,15 @@ export default function PropertyDetail() {
         mode={unitMode}
         propertyId={property.id}
         initial={unitInitial}
+      />
+
+      <TenancyFormDialog
+        open={tenancyOpen}
+        onOpenChange={setTenancyOpen}
+        mode={tenancyMode}
+        propertyId={property.id}
+        units={unitsQuery.data ?? []}
+        initial={tenancyInitial}
       />
     </div>
   );
@@ -370,3 +408,80 @@ function PropertyPack({ property }: { property: import("@/data/demo").Property |
 import { RentTable } from "./Rent";
 import { ExpensesTable } from "./Expenses";
 import { DocumentsTable } from "./Documents";
+
+function TenanciesSection({
+  tenancies, loading, canManage, hasUnits, source, onAdd, onEdit,
+}: {
+  tenancies: TenancyRow[];
+  loading: boolean;
+  canManage: boolean;
+  hasUnits: boolean;
+  source: "loading" | "demo" | "supabase";
+  onAdd: () => void;
+  onEdit: (t: TenancyRow) => void;
+}) {
+  const statusLabel: Record<string, string> = { active: "Active", pending: "Pending", ended: "Ended" };
+  const depositLabel: Record<string, string> = {
+    unknown: "Deposit: unknown", not_required: "No deposit", protected: "Deposit protected",
+    unprotected: "Deposit unprotected", returned: "Deposit returned",
+  };
+  const addTitle = !canManage
+    ? (source === "supabase" ? "Sign in to manage tenancies." : "Demo records cannot be edited.")
+    : !hasUnits ? "Add a unit or room before creating a tenancy." : "Add tenancy";
+  return (
+    <div className="card-surface p-5">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h3 className="font-display text-lg font-semibold">Tenancies</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {canManage ? `${tenancies.length} tenancy(ies) on file` : "Sign in to view tenancies"}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onAdd}
+          disabled={!canManage || !hasUnits}
+          title={addTitle}
+          className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        >
+          Add tenancy
+        </button>
+      </div>
+      <div className="mt-4">
+        {!canManage ? (
+          <p className="text-sm text-muted-foreground">
+            {source === "supabase" ? "Sign in to view tenancies." : "Sign in to manage real tenancies. Demo data is read-only."}
+          </p>
+        ) : !hasUnits ? (
+          <p className="text-sm text-muted-foreground">Add a unit or room before creating a tenancy.</p>
+        ) : loading ? (
+          <p className="text-sm text-muted-foreground">Loading tenancies…</p>
+        ) : tenancies.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No tenancies yet.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {tenancies.map(t => (
+              <li key={t.id} className="py-3 flex flex-wrap items-center gap-3">
+                <span className="text-sm font-medium flex-1 min-w-[160px]">{t.tenant?.display_name ?? "Tenant"}</span>
+                <span className="text-xs text-muted-foreground">{t.unit?.name ?? "Whole property"}</span>
+                <span className="text-xs text-muted-foreground">{statusLabel[t.status ?? ""] ?? "—"}</span>
+                <span className="text-xs text-muted-foreground num">
+                  £{Number(t.rent_amount ?? 0).toLocaleString()}
+                  {t.rent_due_day ? ` · due day ${t.rent_due_day}` : ""}
+                </span>
+                <span className="text-xs text-muted-foreground">{depositLabel[t.deposit_status ?? ""] ?? ""}</span>
+                <button
+                  type="button"
+                  onClick={() => onEdit(t)}
+                  className="h-8 px-3 rounded-md border border-border text-xs hover:bg-secondary"
+                >
+                  Edit
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
