@@ -74,7 +74,7 @@ export default function Layout() {
               >
                 <Bell className="size-4" />
                 <span className="absolute -top-1 -right-1 size-4 grid place-items-center rounded-full bg-accent text-accent-foreground text-[10px] font-semibold">
-                  9
+                  {stats.reviewItems}
                 </span>
               </NavLink>
               {user ? (
