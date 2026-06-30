@@ -78,15 +78,25 @@ export default function PropertyDetail() {
             <Metric label="Readiness" value={`${property.readiness}%`} />
             <Metric label="Open review" value={`${property.openReviewItems}`} />
             <Metric label="Monthly rent" value={gbp(property.expectedMonthlyRent)} />
-            <button
-              type="button"
-              onClick={openEdit}
-              disabled={!user}
-              title={user ? "Edit property" : "Sign in to manage properties."}
-              className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-1.5 hover:bg-secondary disabled:opacity-50"
-            >
-              <Pencil className="size-3.5" /> Edit
-            </button>
+            {(() => {
+              const canEdit = !!user && source === "supabase";
+              const title = !user
+                ? "Sign in to manage properties."
+                : source !== "supabase"
+                  ? "Demo records cannot be edited."
+                  : "Edit property";
+              return (
+                <button
+                  type="button"
+                  onClick={openEdit}
+                  disabled={!canEdit}
+                  title={title}
+                  className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-1.5 hover:bg-secondary disabled:opacity-50"
+                >
+                  <Pencil className="size-3.5" /> Edit
+                </button>
+              );
+            })()}
           </div>
 
         </div>
