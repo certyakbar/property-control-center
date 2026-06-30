@@ -8,6 +8,8 @@ import { StatusBadge, statusTone, priorityTone } from "@/components/StatusBadge"
 import { ArrowLeft, Building2, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PropertyFormDialog, { type PropertyFormInitial } from "@/components/PropertyFormDialog";
+import UnitFormDialog, { type UnitFormInitial } from "@/components/UnitFormDialog";
+import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { toast } from "sonner";
 
 const tabs = ["Overview", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"] as const;
@@ -21,6 +23,12 @@ export default function PropertyDetail() {
   const [tab, setTab] = useState<Tab>("Overview");
   const [editOpen, setEditOpen] = useState(false);
   const [editInitial, setEditInitial] = useState<PropertyFormInitial | null>(null);
+  const [unitOpen, setUnitOpen] = useState(false);
+  const [unitMode, setUnitMode] = useState<"create" | "edit">("create");
+  const [unitInitial, setUnitInitial] = useState<UnitFormInitial | undefined>(undefined);
+
+  const canManage = !!user && source === "supabase";
+  const unitsQuery = usePropertyUnits(property?.id, canManage);
 
   const openEdit = async () => {
     if (!user || !property) return;
@@ -32,6 +40,18 @@ export default function PropertyDetail() {
     setEditInitial(data as PropertyFormInitial);
     setEditOpen(true);
   };
+
+  const openAddUnit = () => {
+    setUnitMode("create");
+    setUnitInitial(undefined);
+    setUnitOpen(true);
+  };
+  const openEditUnit = (u: UnitFormInitial) => {
+    setUnitMode("edit");
+    setUnitInitial(u);
+    setUnitOpen(true);
+  };
+
 
 
   if (!property) {
@@ -168,6 +188,18 @@ export default function PropertyDetail() {
               ))}
             </ul>
           </div>
+
+          <div className="lg:col-span-3">
+            <UnitsSection
+              units={unitsQuery.data ?? []}
+              loading={unitsQuery.isLoading}
+              canManage={canManage}
+              fallbackCount={property.rooms}
+              source={source}
+              onAdd={openAddUnit}
+              onEdit={openEditUnit}
+            />
+          </div>
         </section>
       )}
 
@@ -185,9 +217,81 @@ export default function PropertyDetail() {
           initial={editInitial}
         />
       )}
+
+      <UnitFormDialog
+        open={unitOpen}
+        onOpenChange={setUnitOpen}
+        mode={unitMode}
+        propertyId={property.id}
+        initial={unitInitial}
+      />
     </div>
   );
 }
+
+function UnitsSection({
+  units, loading, canManage, fallbackCount, source, onAdd, onEdit,
+}: {
+  units: import("@/hooks/usePropertyUnits").UnitRow[];
+  loading: boolean;
+  canManage: boolean;
+  fallbackCount: number;
+  source: "loading" | "demo" | "supabase";
+  onAdd: () => void;
+  onEdit: (u: import("@/components/UnitFormDialog").UnitFormInitial) => void;
+}) {
+  const freqLabel: Record<string, string> = { weekly: "Weekly", monthly: "Monthly", quarterly: "Quarterly" };
+  const statusLabel: Record<string, string> = { available: "Available", occupied: "Occupied", inactive: "Inactive" };
+  const addTitle = canManage ? "Add unit / room" : source === "supabase" ? "Sign in to manage units." : "Demo records cannot be edited.";
+  return (
+    <div className="card-surface p-5">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h3 className="font-display text-lg font-semibold">Units / rooms</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {canManage ? `${units.length} unit(s) on file` : `${fallbackCount} room(s) on file (demo)`}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onAdd}
+          disabled={!canManage}
+          title={addTitle}
+          className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        >
+          Add unit
+        </button>
+      </div>
+      <div className="mt-4">
+        {!canManage ? (
+          <p className="text-sm text-muted-foreground">{source === "supabase" ? "Sign in to view units." : "Sign in to manage real units. Demo properties show a static room count."}</p>
+        ) : loading ? (
+          <p className="text-sm text-muted-foreground">Loading units…</p>
+        ) : units.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No units yet. Add one to structure this property.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {units.map(u => (
+              <li key={u.id} className="py-3 flex flex-wrap items-center gap-3">
+                <span className="text-sm font-medium flex-1 min-w-[160px]">{u.name}</span>
+                <span className="text-xs text-muted-foreground">{statusLabel[u.status ?? ""] ?? "—"}</span>
+                <span className="text-xs text-muted-foreground num">£{Number(u.expected_rent ?? 0).toLocaleString()} {freqLabel[u.rent_frequency ?? ""] ?? ""}</span>
+                <button
+                  type="button"
+                  onClick={() => onEdit(u)}
+                  className="h-8 px-3 rounded-md border border-border text-xs hover:bg-secondary"
+                >
+                  Edit
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 
 function Metric({ label, value }: { label: string; value: string }) {
