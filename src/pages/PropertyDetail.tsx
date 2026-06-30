@@ -2,9 +2,13 @@ import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { recentActivity, gbp } from "@/data/demo";
 import { useLedgerData } from "@/hooks/useLedgerData";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { StatusBadge, statusTone, priorityTone } from "@/components/StatusBadge";
-import { ArrowLeft, Building2, MapPin } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PropertyFormDialog, { type PropertyFormInitial } from "@/components/PropertyFormDialog";
+import { toast } from "sonner";
 
 const tabs = ["Overview", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"] as const;
 type Tab = typeof tabs[number];
@@ -12,8 +16,23 @@ type Tab = typeof tabs[number];
 export default function PropertyDetail() {
   const { id = "" } = useParams();
   const { properties, rentRows, expenses, documents, reviewItems } = useLedgerData();
+  const { user } = useAuth();
   const property = properties.find(p => p.id === id);
   const [tab, setTab] = useState<Tab>("Overview");
+  const [editOpen, setEditOpen] = useState(false);
+  const [editInitial, setEditInitial] = useState<PropertyFormInitial | null>(null);
+
+  const openEdit = async () => {
+    if (!user || !property) return;
+    const { data, error } = await supabase.from("properties").select("*").eq("id", property.id).maybeSingle();
+    if (error || !data) {
+      toast.error("Could not load property details");
+      return;
+    }
+    setEditInitial(data as PropertyFormInitial);
+    setEditOpen(true);
+  };
+
 
   if (!property) {
     return (
@@ -59,7 +78,17 @@ export default function PropertyDetail() {
             <Metric label="Readiness" value={`${property.readiness}%`} />
             <Metric label="Open review" value={`${property.openReviewItems}`} />
             <Metric label="Monthly rent" value={gbp(property.expectedMonthlyRent)} />
+            <button
+              type="button"
+              onClick={openEdit}
+              disabled={!user}
+              title={user ? "Edit property" : "Sign in to manage properties."}
+              className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-1.5 hover:bg-secondary disabled:opacity-50"
+            >
+              <Pencil className="size-3.5" /> Edit
+            </button>
           </div>
+
         </div>
 
         <div className="mt-5 h-1.5 rounded-full bg-border overflow-hidden">
@@ -137,9 +166,19 @@ export default function PropertyDetail() {
       {tab === "Documents" && <PropertyDocs rows={propDocs} />}
       {tab === "Compliance" && <PropertyDocs rows={propDocs.filter(d => d.type !== "Repair Invoice" && d.type !== "Tenancy Agreement")} title="Compliance documents" />}
       {tab === "Quarterly Pack" && <PropertyPack property={property} />}
+
+      {editInitial && (
+        <PropertyFormDialog
+          open={editOpen}
+          onOpenChange={(o) => { setEditOpen(o); if (!o) setEditInitial(null); }}
+          mode="edit"
+          initial={editInitial}
+        />
+      )}
     </div>
   );
 }
+
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (

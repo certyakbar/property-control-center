@@ -1,21 +1,34 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { gbp } from "@/data/demo";
 import { useLedgerData } from "@/hooks/useLedgerData";
+import { useAuth } from "@/lib/auth";
 import { StatusBadge, statusTone } from "@/components/StatusBadge";
 import { Building2, MapPin, BedDouble, ArrowRight } from "lucide-react";
+import PropertyFormDialog from "@/components/PropertyFormDialog";
 
 export default function Properties() {
   const { properties } = useLedgerData();
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground">Every property is a control room. Open one to see rent, expenses, documents and quarterly readiness.</p>
         </div>
-        <button className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+        <button
+          onClick={() => setOpen(true)}
+          disabled={!user}
+          title={user ? "Add a new property" : "Sign in to manage properties."}
+          className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        >
           Add property
         </button>
       </div>
+
+      <PropertyFormDialog open={open} onOpenChange={setOpen} mode="create" />
+
 
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {properties.map(p => (
