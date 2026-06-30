@@ -1,11 +1,13 @@
-import { properties, expenses, rentRows, reviewItems, gbp } from "@/data/demo";
+import { gbp } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, priorityTone } from "@/components/StatusBadge";
 import { Download, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function QuarterlyPack() {
-  const readiness = 82;
-  const blocking = 6;
+  const { properties, expenses, rentRows, reviewItems, stats } = useLedgerData();
+  const readiness = stats.quarterlyReadiness;
+  const blocking = reviewItems.length;
 
   const incomeByProperty = properties.map(p => ({
     name: p.name,

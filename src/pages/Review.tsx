@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { reviewItems, type ReviewPriority, type ReviewType } from "@/data/demo";
+import { type ReviewPriority, type ReviewType } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, priorityTone } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ const priorities: (ReviewPriority | "All")[] = ["All", "Urgent", "High", "Medium
 const types: (ReviewType | "All")[] = ["All", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"];
 
 export default function ReviewPage() {
+  const { reviewItems } = useLedgerData();
   const [priority, setPriority] = useState<typeof priorities[number]>("All");
   const [type, setType] = useState<typeof types[number]>("All");
 

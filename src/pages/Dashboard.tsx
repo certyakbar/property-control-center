@@ -3,18 +3,21 @@ import {
   Building2, AlertOctagon, ReceiptText, FileWarning, CheckSquare, FolderArchive,
   ArrowRight, Sparkles, ChevronRight,
 } from "lucide-react";
-import { stats, todaysActions, recentActivity, gbp, properties } from "@/data/demo";
+import { gbp } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, priorityTone } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
 
-const tiles = [
-  { label: "Properties",            value: stats.totalProperties,         icon: Building2,    to: "/properties",   tone: "neutral" as const },
-  { label: "Overdue rent",          value: stats.overdueRent,             icon: AlertOctagon, to: "/rent",         tone: "overdue" as const },
-  { label: "Missing receipts",      value: stats.missingReceipts,         icon: ReceiptText,  to: "/expenses",     tone: "missing" as const },
-  { label: "Documents expiring",    value: stats.documentsExpiringSoon,   icon: FileWarning,  to: "/documents",    tone: "soon" as const },
-  { label: "Review items",          value: stats.reviewItems,             icon: CheckSquare,  to: "/review",       tone: "review" as const },
-  { label: "Quarterly pack",        value: `${stats.quarterlyReadiness}%`,icon: FolderArchive,to: "/quarterly-pack", tone: "info" as const },
-];
+function buildTiles(stats: ReturnType<typeof useLedgerData>["stats"]) {
+  return [
+    { label: "Properties",            value: stats.totalProperties,         icon: Building2,    to: "/properties",   tone: "neutral" as const },
+    { label: "Overdue rent",          value: stats.overdueRent,             icon: AlertOctagon, to: "/rent",         tone: "overdue" as const },
+    { label: "Missing receipts",      value: stats.missingReceipts,         icon: ReceiptText,  to: "/expenses",     tone: "missing" as const },
+    { label: "Documents expiring",    value: stats.documentsExpiringSoon,   icon: FileWarning,  to: "/documents",    tone: "soon" as const },
+    { label: "Review items",          value: stats.reviewItems,             icon: CheckSquare,  to: "/review",       tone: "review" as const },
+    { label: "Quarterly pack",        value: `${stats.quarterlyReadiness}%`,icon: FolderArchive,to: "/quarterly-pack", tone: "info" as const },
+  ];
+}
 
 const toneRing: Record<string, string> = {
   neutral: "bg-status-neutral-bg text-status-neutral",
@@ -26,6 +29,8 @@ const toneRing: Record<string, string> = {
 };
 
 export default function Dashboard() {
+  const { stats, todaysActions, recentActivity, properties } = useLedgerData();
+  const tiles = buildTiles(stats);
   return (
     <div className="space-y-8 max-w-7xl">
       {/* Hero / readiness banner */}

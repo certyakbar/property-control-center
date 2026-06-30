@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { findProperty, rentRows, expenses, documents, reviewItems, recentActivity, gbp } from "@/data/demo";
+import { recentActivity, gbp } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, statusTone, priorityTone } from "@/components/StatusBadge";
 import { ArrowLeft, Building2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,8 @@ type Tab = typeof tabs[number];
 
 export default function PropertyDetail() {
   const { id = "" } = useParams();
-  const property = findProperty(id);
+  const { properties, rentRows, expenses, documents, reviewItems } = useLedgerData();
+  const property = properties.find(p => p.id === id);
   const [tab, setTab] = useState<Tab>("Overview");
 
   if (!property) {
@@ -158,21 +160,21 @@ function SummaryCard({ title, tone, label, footer }: { title: string; tone: Retu
   );
 }
 
-function PropertyRent({ rows }: { rows: typeof rentRows }) {
+function PropertyRent({ rows }: { rows: import("@/data/demo").RentRow[] }) {
   return (
     <div className="card-surface overflow-hidden">
       <RentTable rows={rows} hideProperty />
     </div>
   );
 }
-function PropertyExpenses({ rows }: { rows: typeof expenses }) {
+function PropertyExpenses({ rows }: { rows: import("@/data/demo").Expense[] }) {
   return (
     <div className="card-surface overflow-hidden">
       <ExpensesTable rows={rows} hideProperty />
     </div>
   );
 }
-function PropertyDocs({ rows, title }: { rows: typeof documents; title?: string }) {
+function PropertyDocs({ rows, title }: { rows: import("@/data/demo").PropertyDoc[]; title?: string }) {
   return (
     <div className="card-surface overflow-hidden">
       {title && <div className="px-5 pt-5 font-display text-lg font-semibold">{title}</div>}
@@ -181,7 +183,7 @@ function PropertyDocs({ rows, title }: { rows: typeof documents; title?: string 
   );
 }
 
-function PropertyPack({ property }: { property: ReturnType<typeof findProperty> }) {
+function PropertyPack({ property }: { property: import("@/data/demo").Property | undefined }) {
   if (!property) return null;
   return (
     <div className="card-surface p-6 space-y-5">

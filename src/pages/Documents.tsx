@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { documents, type PropertyDoc } from "@/data/demo";
+import { type PropertyDoc } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, statusTone } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
 
 const filters = ["All", "Expiring soon", "Expired", "Missing information", "Active"] as const;
 
 export default function DocumentsPage() {
+  const { documents } = useLedgerData();
   const [filter, setFilter] = useState<typeof filters[number]>("All");
   const rows = filter === "All" ? documents : documents.filter(d => d.status === filter);
 
