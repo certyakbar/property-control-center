@@ -9,7 +9,9 @@ import { ArrowLeft, Building2, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PropertyFormDialog, { type PropertyFormInitial } from "@/components/PropertyFormDialog";
 import UnitFormDialog, { type UnitFormInitial } from "@/components/UnitFormDialog";
+import TenancyFormDialog from "@/components/TenancyFormDialog";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyTenancies, type TenancyRow } from "@/hooks/usePropertyTenancies";
 import { toast } from "sonner";
 
 const tabs = ["Overview", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"] as const;
