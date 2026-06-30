@@ -188,6 +188,18 @@ export default function PropertyDetail() {
               ))}
             </ul>
           </div>
+
+          <div className="lg:col-span-3">
+            <UnitsSection
+              units={unitsQuery.data ?? []}
+              loading={unitsQuery.isLoading}
+              canManage={canManage}
+              fallbackCount={property.rooms}
+              source={source}
+              onAdd={openAddUnit}
+              onEdit={openEditUnit}
+            />
+          </div>
         </section>
       )}
 
