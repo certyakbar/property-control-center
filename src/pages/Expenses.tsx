@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { expenses, gbp, type Expense } from "@/data/demo";
+import { gbp, type Expense } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, statusTone } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
 
 const filters = ["All", "Needs review", "Missing receipt", "Approved"] as const;
 
 export default function ExpensesPage() {
+  const { expenses } = useLedgerData();
   const [filter, setFilter] = useState<typeof filters[number]>("All");
   const rows = expenses.filter(e => {
     if (filter === "All") return true;

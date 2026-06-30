@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { rentRows, gbp, type RentRow } from "@/data/demo";
+import { gbp, type RentRow } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 import { StatusBadge, statusTone } from "@/components/StatusBadge";
 import { cn } from "@/lib/utils";
 
 const filters = ["All", "Overdue", "Partial", "Paid", "Due soon"] as const;
 
 export default function RentPage() {
+  const { rentRows } = useLedgerData();
   const [filter, setFilter] = useState<typeof filters[number]>("All");
   const rows = filter === "All" ? rentRows : rentRows.filter(r => r.status === filter || (filter === "Partial" && r.status === "Partial"));
 

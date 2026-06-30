@@ -5,6 +5,7 @@ import { StatusBadge, statusTone } from "@/components/StatusBadge";
 import { Building2, MapPin, BedDouble, ArrowRight } from "lucide-react";
 
 export default function Properties() {
+  const { properties } = useLedgerData();
   return (
     <div className="space-y-6 max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-3">
