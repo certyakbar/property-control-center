@@ -12,7 +12,7 @@ const nav = [
   { to: "/rent",           label: "Rent",         icon: Banknote },
   { to: "/expenses",       label: "Expenses",     icon: ReceiptText },
   { to: "/documents",      label: "Documents",    icon: FileText },
-  { to: "/review",         label: "Review",       icon: CheckSquare, badge: stats.reviewItems },
+  { to: "/review",         label: "Review",       icon: CheckSquare, badgeKey: "reviewItems" as const },
   { to: "/quarterly-pack", label: "Quarterly Pack", icon: FolderArchive },
   { to: "/settings",       label: "Settings",     icon: SettingsIcon },
 ];
