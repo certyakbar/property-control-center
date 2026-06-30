@@ -23,7 +23,7 @@ export default function Layout() {
   const meta = titles[key] ?? { title: "Property", sub: "" };
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { source } = useLedgerData();
+  const { source, stats } = useLedgerData();
   const initials = (user?.email ?? "SH").slice(0, 2).toUpperCase();
 
   return (
