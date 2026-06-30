@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 type AuthCtx = {
@@ -17,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const joinedRef = useRef<string | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Register listener first
@@ -29,7 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Defer RPC to avoid running inside the auth callback synchronously
         setTimeout(() => {
           supabase.rpc("dev_join_demo_org").then(({ error }) => {
-            if (error) console.warn("[auth] dev_join_demo_org failed:", error.message);
+            if (error) {
+              console.warn("[auth] dev_join_demo_org failed:", error.message);
+              return;
+            }
+            queryClient.invalidateQueries({ queryKey: ["active-org"] });
+            queryClient.invalidateQueries({ queryKey: ["ledger"] });
           });
         }, 0);
       }

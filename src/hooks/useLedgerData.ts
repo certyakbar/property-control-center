@@ -147,9 +147,9 @@ function mapToPhase1(raw: Awaited<ReturnType<typeof fetchAll>>): Omit<LedgerData
       expectedMonthlyRent: Number(p.expected_monthly_rent ?? 0),
       readiness: Number(p.readiness_score ?? 0),
       openReviewItems: openReviewByProp.get(p.id) ?? 0,
-      rentStatus: (p.rent_status as Property["rentStatus"]) ?? "On track",
-      documentStatus: (p.document_status as Property["documentStatus"]) ?? "Up to date",
-      expenseStatus: (p.expense_status as Property["expenseStatus"]) ?? "All evidenced",
+      rentStatus: ((p.rent_status && p.rent_status !== "unknown") ? p.rent_status : "On track") as Property["rentStatus"],
+      documentStatus: ((p.document_status && p.document_status !== "unknown") ? p.document_status : "Up to date") as Property["documentStatus"],
+      expenseStatus: ((p.expense_status && p.expense_status !== "unknown") ? p.expense_status : "All evidenced") as Property["expenseStatus"],
     };
   });
 
