@@ -58,6 +58,16 @@ export default function PropertyDetail() {
     setUnitInitial(u);
     setUnitOpen(true);
   };
+  const openAddTenancy = () => {
+    setTenancyMode("create");
+    setTenancyInitial(undefined);
+    setTenancyOpen(true);
+  };
+  const openEditTenancy = (t: TenancyRow) => {
+    setTenancyMode("edit");
+    setTenancyInitial(t);
+    setTenancyOpen(true);
+  };
 
 
 
