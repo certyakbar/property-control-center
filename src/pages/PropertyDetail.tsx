@@ -2,9 +2,13 @@ import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { recentActivity, gbp } from "@/data/demo";
 import { useLedgerData } from "@/hooks/useLedgerData";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { StatusBadge, statusTone, priorityTone } from "@/components/StatusBadge";
-import { ArrowLeft, Building2, MapPin } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PropertyFormDialog, { type PropertyFormInitial } from "@/components/PropertyFormDialog";
+import { toast } from "sonner";
 
 const tabs = ["Overview", "Rent", "Expenses", "Documents", "Compliance", "Quarterly Pack"] as const;
 type Tab = typeof tabs[number];
@@ -12,8 +16,23 @@ type Tab = typeof tabs[number];
 export default function PropertyDetail() {
   const { id = "" } = useParams();
   const { properties, rentRows, expenses, documents, reviewItems } = useLedgerData();
+  const { user } = useAuth();
   const property = properties.find(p => p.id === id);
   const [tab, setTab] = useState<Tab>("Overview");
+  const [editOpen, setEditOpen] = useState(false);
+  const [editInitial, setEditInitial] = useState<PropertyFormInitial | null>(null);
+
+  const openEdit = async () => {
+    if (!user || !property) return;
+    const { data, error } = await supabase.from("properties").select("*").eq("id", property.id).maybeSingle();
+    if (error || !data) {
+      toast.error("Could not load property details");
+      return;
+    }
+    setEditInitial(data as PropertyFormInitial);
+    setEditOpen(true);
+  };
+
 
   if (!property) {
     return (
