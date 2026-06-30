@@ -4,7 +4,7 @@ import {
   CheckSquare, FolderArchive, Settings as SettingsIcon, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { stats } from "@/data/demo";
+import { useLedgerData } from "@/hooks/useLedgerData";
 
 const nav = [
   { to: "/", label: "Dashboard",      icon: LayoutDashboard,  end: true },
@@ -12,12 +12,13 @@ const nav = [
   { to: "/rent",           label: "Rent",         icon: Banknote },
   { to: "/expenses",       label: "Expenses",     icon: ReceiptText },
   { to: "/documents",      label: "Documents",    icon: FileText },
-  { to: "/review",         label: "Review",       icon: CheckSquare, badge: stats.reviewItems },
+  { to: "/review",         label: "Review",       icon: CheckSquare, badgeKey: "reviewItems" as const },
   { to: "/quarterly-pack", label: "Quarterly Pack", icon: FolderArchive },
   { to: "/settings",       label: "Settings",     icon: SettingsIcon },
 ];
 
 export function AppSidebar() {
+  const { stats } = useLedgerData();
   return (
     <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border bg-gradient-room sticky top-0 h-screen">
       <div className="px-6 py-6 border-b border-sidebar-border">
@@ -36,7 +37,9 @@ export function AppSidebar() {
         <div className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-wider text-sidebar-foreground/50">
           Workspace
         </div>
-        {nav.map(({ to, label, icon: Icon, end, badge }) => (
+        {nav.map(({ to, label, icon: Icon, end, badgeKey }) => {
+          const badge = badgeKey ? stats[badgeKey] : undefined;
+          return (
           <NavLink
             key={to}
             to={to}
@@ -58,7 +61,8 @@ export function AppSidebar() {
               </span>
             ) : null}
           </NavLink>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
