@@ -18,6 +18,7 @@ const nav = [
 ];
 
 export function AppSidebar() {
+  const { stats } = useLedgerData();
   return (
     <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border bg-gradient-room sticky top-0 h-screen">
       <div className="px-6 py-6 border-b border-sidebar-border">
