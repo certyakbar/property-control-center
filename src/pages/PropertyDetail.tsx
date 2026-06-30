@@ -166,9 +166,19 @@ export default function PropertyDetail() {
       {tab === "Documents" && <PropertyDocs rows={propDocs} />}
       {tab === "Compliance" && <PropertyDocs rows={propDocs.filter(d => d.type !== "Repair Invoice" && d.type !== "Tenancy Agreement")} title="Compliance documents" />}
       {tab === "Quarterly Pack" && <PropertyPack property={property} />}
+
+      {editInitial && (
+        <PropertyFormDialog
+          open={editOpen}
+          onOpenChange={(o) => { setEditOpen(o); if (!o) setEditInitial(null); }}
+          mode="edit"
+          initial={editInitial}
+        />
+      )}
     </div>
   );
 }
+
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
